@@ -91,7 +91,7 @@ Example, servo 1 to 1500 µs in 1000 ms: `55 55 08 03 01 E8 03 01 DC 05`.
 Rung 0 has to answer: the BT24's advertised name and services, whether writing a SERVO_MOVE frame to `FFE1`
 moves a servo, whether the board answers GET_BATTERY_VOLTAGE over BLE, and which servo ID is which joint.
 
-## 5. Joints (fill in during Rung 0)
+## 5. Joints (filled in during Rung 0, 2026-11-22)
 
 | ID | Joint | Stock-board port | Safe min µs | Safe max µs | Home µs | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -100,7 +100,7 @@ moves a servo, whether the board answers GET_BATTERY_VOLTAGE over BLE, and which
 | 3 | Wrist pitch ✅ | 3 | 550 | 2450 | 1500 | both ends were the probe's 500/2500 cap, not a felt stop |
 | 4 | Elbow ✅ | 4 | 550 | 2450 | 1500 | both ends were the probe's 500/2500 cap (tested with shoulder at 1500) |
 | 5 | Shoulder ✅ | 5 | 550 | 2450 | 1500 | heaviest load; hit the probe's 500/2500 cap; tested with the elbow at 550, so other elbow angles may reach the table **[?]** |
-| 6 | Base rotate ✅ | 6 | | | | was unplugged at first |
+| 6 | Base rotate ✅ | 6 | 550 | 2450 | 1500 | hit the probe's 500/2500 cap; was unplugged at first |
 
 ## 6. Requirements
 

@@ -37,9 +37,18 @@ Hiwonder LSC frame `55 55 <len> <cmd> <params>`, written to 0xFFE1; len = bytes 
 | 6 | Base rotate (moved 1500 -> 1200 -> 1500 once its plug was put back in port 6) |
 All of 1-5 at 1500 = arm standing straight up.
 
+## Safe ranges (verified 2026-11-22, each joint jogged alone, backed off 50 from the end)
+| ID | Min us | Max us | Notes |
+| --- | --- | --- | --- |
+| 1 | 1300 (open) | 2450 (closed) | |
+| 2-6 | 550 | 2450 | Every end was the probe's 500/2500 software cap, not a physical stop |
+Shoulder (5) was tested with the elbow at 550. Per-joint limits alone don't stop shoulder + elbow combinations
+from reaching the table.
+
 ## Decisions
 - Keep the stock controller. Plan A: the ESP-NOW Controller connects over BLE to the BT24 and sends Hiwonder serial commands (no extra hardware). Plan B: ESP32 bridge on the serial header. Plan C: PCA9685 direct drive.
 - The car's `Protocol.h` stays untouched by arm work.
 
 ## Gotchas
-(none yet)
+- Restarting the serial monitor resets the ESP32-C3, so the probe forgets the real pose (`p` shows 1500).
+  Use absolute `m` moves, not `j` jogs, until each joint has been moved once.
