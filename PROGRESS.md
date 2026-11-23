@@ -7,14 +7,18 @@
 
 ## Current target: Rung 0 "Wake-up" - find each joint's safe range from the ESP32
 - ✅ Phone (nRF Connect) and ✅ ESP32-C3 SuperMini (COM14, `firmware/probes/ble_probe`) both talk to the arm over
-  BLE: "Hiwonder", service FFF0, char FFE1. Battery read 7.75 V. Joints 1-5 mapped (PROJECT-NOTES.md).
+  BLE: "Hiwonder", service FFF0, char FFE1. Battery read 7.75 V. All 6 joints mapped (PROJECT-NOTES.md).
+- 2026-11-22: `c` checked: arm was already straight up (all 1500), so nothing moved; that is correct.
+  Type ONE command per line (`j 1 -100 / j 1 100` only ran the first part).
+- 2026-11-22: ✅ Servo 6 (base) turns with `m 6 1200 2000` / `m 6 1500 2000`. Its plug had come out of port 6.
+- Serial Monitor without the IDE: `arduino-cli monitor -p COM14 -c baudrate=115200` (Ctrl+C to quit; close it
+  before uploading). Typed letters may not echo.
 - Probe commands in the Serial Monitor: `m ID POS [MS]`, `j ID STEP`, `c`, `b`, `t MS`, `p`, `raw`.
 
 ## Next (the user can answer with one of these)
-1. **"Servo 6: ..."** - type `c` (all center), then `m 6 1200 2000` and `m 6 1500 2000`. Does the base turn?
-2. **"Limits: ..."** - for each joint, jog with `j ID 100` / `j ID -100` until it nears a hard stop or hits the
+1. **"Limits: ..."** - for each joint, jog with `j ID 100` / `j ID -100` until it nears a hard stop or hits the
    table, back off 50, and note the number (`p` shows it). Fill the joint table in docs/FSD.md section 5.
-3. Then Rung 1: Arm mode in the ESP-NOW Controller (stick drives joints over BLE).
+2. Then Rung 1: Arm mode in the ESP-NOW Controller (stick drives joints over BLE).
 
 ## Key decisions
 - Plan A: controller talks BLE directly to the BT24 (no extra hardware). The arm "brains" (poses, tasks,

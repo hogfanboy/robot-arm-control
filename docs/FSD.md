@@ -100,7 +100,7 @@ moves a servo, whether the board answers GET_BATTERY_VOLTAGE over BLE, and which
 | 3 | Wrist pitch ✅ | 3 | | | | |
 | 4 | Elbow ✅ | 4 | | | | |
 | 5 | Shoulder ✅ | 5 | | | | heaviest load |
-| 6 | Base rotate (no move seen yet) | 6 | | | | |
+| 6 | Base rotate ✅ | 6 | | | | was unplugged at first |
 
 ## 6. Requirements
 

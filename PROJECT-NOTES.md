@@ -34,7 +34,7 @@ Hiwonder LSC frame `55 55 <len> <cmd> <params>`, written to 0xFFE1; len = bytes 
 | 3 | Next joint down (wrist pitch) |
 | 4 | Next joint down (elbow) |
 | 5 | Shoulder (on the base, not the rotation) |
-| 6 | No movement seen at 1500 (base rotate expected; may already have been at center) |
+| 6 | Base rotate (moved 1500 -> 1200 -> 1500 once its plug was put back in port 6) |
 All of 1-5 at 1500 = arm standing straight up.
 
 ## Decisions
