@@ -13,6 +13,8 @@ wireless handle is lost; the PS2 receiver dongle is still on its cable.
   push button, piezo buzzer, LED1/LED2, OFF/ON slide switch, DC barrel jack and a 2-pin screw terminal (+ -),
   220 µF 16 V capacitor (so the supply is under 16 V), crystal marked "8.00".
 - Servos: several labeled LDX-218.
+- Power: original adapter found, 7.5 V 3 A.
+- Bluetooth: the board advertises as "Hiwonder" (seen in nRF Connect; phone connected).
 
 ## Decisions
 - Keep the stock controller. Plan A: the ESP-NOW Controller connects over BLE to the BT24 and sends Hiwonder serial commands (no extra hardware). Plan B: ESP32 bridge on the serial header. Plan C: PCA9685 direct drive.
