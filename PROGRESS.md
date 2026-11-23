@@ -12,7 +12,7 @@
   Type ONE command per line (`j 1 -100 / j 1 100` only ran the first part).
 - 2026-11-22: ✅ Servo 6 (base) turns with `m 6 1200 2000` / `m 6 1500 2000`. Its plug had come out of port 6.
 - 2026-11-22: Claw (1) safe range 1300-2450 (backed off 50 from each end). 1300 = open, 2450 = closed.
-- 2026-11-22: Wrist roll (2) and wrist pitch (3) safe range 550-2450 (both ends at the probe's 500/2500 cap).
+- 2026-11-22: Wrist roll (2), wrist pitch (3), elbow (4) safe range 550-2450 (both ends at the probe's 500/2500 cap).
 - Serial Monitor without the IDE: `arduino-cli monitor -p COM14 -c baudrate=115200` (Ctrl+C to quit; close it
   before uploading). Typed letters may not echo.
 - Probe commands in the Serial Monitor: `m ID POS [MS]`, `j ID STEP`, `c`, `b`, `t MS`, `p`, `raw`.
