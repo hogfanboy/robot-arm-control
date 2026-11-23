@@ -22,12 +22,15 @@ wireless handle is lost; the PS2 receiver dongle is still on its cable.
 Hiwonder LSC frame `55 55 <len> <cmd> <params>`, written to 0xFFE1; len = bytes after the 55 55.
 - SERVO_MOVE (3): `55 55 08 03 01 E8 03 01 DC 05` moved servo 1 (sounded like the claw) to 1500 us over 1000 ms.
 - GET_BATTERY_VOLTAGE (15): `55 55 02 0F` -> reply `55 55 04 0F 1B 1E` = 0x1E1B = 7707 mV (7.5 V adapter).
+- ESP32-C3 SuperMini as BLE client (`firmware/probes/ble_probe`, core 3.3.13 built-in BLE library, no pairing or
+  PIN needed): finds "Hiwonder" by name, connects, writes FFE1 without response, gets replies by notify. Battery
+  read 7750 mV. Signal -50 dBm at desk range. The phone must be disconnected first (one connection at a time).
 
 ## Joint map (verified 2026-11-22, each servo sent to 1500 us)
 | ID | Joint |
 | --- | --- |
 | 1 | Claw (gripper) |
-| 2 | Wrist (the joint at the claw) |
+| 2 | Wrist spin (turns like a doorknob) |
 | 3 | Next joint down (wrist pitch) |
 | 4 | Next joint down (elbow) |
 | 5 | Shoulder (on the base, not the rotation) |

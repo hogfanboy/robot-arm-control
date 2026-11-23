@@ -96,7 +96,7 @@ moves a servo, whether the board answers GET_BATTERY_VOLTAGE over BLE, and which
 | ID | Joint | Stock-board port | Safe min µs | Safe max µs | Home µs | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Gripper ✅ | 1 | | | | open/close |
-| 2 | Wrist ✅ (roll or pitch? **[?]**) | 2 | | | | |
+| 2 | Wrist roll ✅ | 2 | | | | |
 | 3 | Wrist pitch ✅ | 3 | | | | |
 | 4 | Elbow ✅ | 4 | | | | |
 | 5 | Shoulder ✅ | 5 | | | | heaviest load |
@@ -179,7 +179,7 @@ the same code moves to `firmware/arm_bridge`.
 | R0.1 ✅ 7.5 V 3 A adapter found. Still to do: note servo cable → port → joint. | Joint table (section 5) has ports. |
 | ✅ R0.2 Phone + nRF Connect: scan with the arm on, note the name and services. | Hiwonder, FFF0/FFE1. |
 | ✅ R0.3 In nRF Connect write hex `5555080301E80301DC05` to FFE1 (servo 1 to center over 1 s). | One servo moves from the phone. |
-| R0.4 ESP32-C3 probe sketch (a spare C3 or the controller itself): scan, connect, send the same frame. | Servo moves from the ESP32. |
+| ✅ R0.4 ESP32-C3 probe sketch (a spare C3 or the controller itself): scan, connect, send the same frame. | Servo moves from the ESP32. |
 | R0.5 Find each joint's safe min/max by jogging slowly from the probe's serial monitor. | Section 5 filled in. |
 | R1 Controller Arm mode over BLE. | Every joint driven from the handheld; disconnect holds pose. |
 | R2 Teach & repeat. | A taught 10-step pick-and-place runs 20 times in a row. |

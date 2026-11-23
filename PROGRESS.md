@@ -5,16 +5,16 @@
 - Arm identified: LewanSoul/Hiwonder LeArm 6DOF with an LSC-6 style 6-channel controller V2.0 (STM32, DX-BT24
   Bluetooth LE, PS2 receiver port, `5V RX TX GND` serial header). PS2 handle lost.
 
-## Current target: Rung 0 "Wake-up" - map the joints, then move from an ESP32
-- ✅ Phone (nRF Connect) talks to the arm: "Hiwonder", service FFF0, characteristic FFE1. SERVO_MOVE moved
-  servo 1 (claw); battery read 7707 mV. Details in PROJECT-NOTES.md.
+## Current target: Rung 0 "Wake-up" - find each joint's safe range from the ESP32
+- ✅ Phone (nRF Connect) and ✅ ESP32-C3 SuperMini (COM14, `firmware/probes/ble_probe`) both talk to the arm over
+  BLE: "Hiwonder", service FFF0, char FFE1. Battery read 7.75 V. Joints 1-5 mapped (PROJECT-NOTES.md).
+- Probe commands in the Serial Monitor: `m ID POS [MS]`, `j ID STEP`, `c`, `b`, `t MS`, `p`, `raw`.
 
 ## Next (the user can answer with one of these)
-1. **"Servo 6: ..."** - joints 1-5 mapped (PROJECT-NOTES). Servo 6 didn't move at center: send
-   `5555080301D00706B004` (to 1200 over 2 s), then `5555080301D00706DC05` (back to center). Base turns, or not?
-2. **"Write the ESP32 probe"** - Claude writes `firmware/probes/ble_probe`: the ESP32-C3 finds "Hiwonder",
-   connects, and moves joints from serial-monitor commands. Say which board to flash (the controller itself or a
-   spare C3).
+1. **"Servo 6: ..."** - type `c` (all center), then `m 6 1200 2000` and `m 6 1500 2000`. Does the base turn?
+2. **"Limits: ..."** - for each joint, jog with `j ID 100` / `j ID -100` until it nears a hard stop or hits the
+   table, back off 50, and note the number (`p` shows it). Fill the joint table in docs/FSD.md section 5.
+3. Then Rung 1: Arm mode in the ESP-NOW Controller (stick drives joints over BLE).
 
 ## Key decisions
 - Plan A: controller talks BLE directly to the BT24 (no extra hardware). The arm "brains" (poses, tasks,
