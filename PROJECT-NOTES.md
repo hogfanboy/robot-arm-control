@@ -14,7 +14,14 @@ wireless handle is lost; the PS2 receiver dongle is still on its cable.
   220 µF 16 V capacitor (so the supply is under 16 V), crystal marked "8.00".
 - Servos: several labeled LDX-218.
 - Power: original adapter found, 7.5 V 3 A.
-- Bluetooth: the board advertises as "Hiwonder" (seen in nRF Connect; phone connected).
+- Bluetooth: the board advertises as "Hiwonder" (nRF Connect, 2026-11-22). Service **0xFFF0** (not FFE0), with
+  characteristic **0xFFE1** (NOTIFY, READ, WRITE, WRITE NO RESPONSE; notifications carry the board's replies) and a
+  second write-only characteristic (UUID not read yet). Also has Device Information (0x180A).
+
+## Command protocol (verified over BLE from a phone, 2026-11-22)
+Hiwonder LSC frame `55 55 <len> <cmd> <params>`, written to 0xFFE1; len = bytes after the 55 55.
+- SERVO_MOVE (3): `55 55 08 03 01 E8 03 01 DC 05` moved servo 1 (sounded like the claw) to 1500 us over 1000 ms.
+- GET_BATTERY_VOLTAGE (15): `55 55 02 0F` -> reply `55 55 04 0F 1B 1E` = 0x1E1B = 7707 mV (7.5 V adapter).
 
 ## Decisions
 - Keep the stock controller. Plan A: the ESP-NOW Controller connects over BLE to the BT24 and sends Hiwonder serial commands (no extra hardware). Plan B: ESP32 bridge on the serial header. Plan C: PCA9685 direct drive.

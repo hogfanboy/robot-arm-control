@@ -67,12 +67,11 @@ it can pretend to be the phone app: connect to the BT24 and send the same comman
 
 ## 4. Bluetooth link and serial protocol (to be verified in Rung 0)
 
-**BT24 Bluetooth (from a copy of the DX-BT24 manual, not yet checked on our arm):** BLE service `FFE0`,
-characteristic `FFE1` (notify + write), `FFE2` (write). Advertised name **[?]** (find it with the free phone app
-"nRF Connect"). Bytes written to `FFE1` come out of the module's serial pin into the STM32.
+**Bluetooth (✅ verified 2026-11-22):** advertises as `Hiwonder`; service `FFF0`, characteristic `FFE1`
+(notify + write). Bytes written to `FFE1` reach the STM32; its replies come back as notifications.
 
 **Commands:** Hiwonder's LSC-series controllers use this frame at **9600 baud, 8N1** (from Hiwonder's published
-LSC protocol; **not yet confirmed on our board**). The same bytes work over the header or over Bluetooth:
+LSC protocol; ✅ SERVO_MOVE and GET_BATTERY_VOLTAGE confirmed over BLE). The same bytes work over the header or over Bluetooth:
 
 Hiwonder's LSC-series servo controllers use this frame at **9600 baud, 8N1** (from Hiwonder's published
 LSC protocol; **not yet confirmed on our V2.0 board**):
@@ -177,9 +176,9 @@ the same code moves to `firmware/arm_bridge`.
 
 | Step | Done when |
 | --- | --- |
-| R0.1 Read the power-supply label; note servo cable → port → joint. | Joint table (section 5) has ports. |
-| R0.2 Phone + nRF Connect: scan with the arm on, note the BT24's name, MAC and services. | FFE0/FFE1 confirmed. |
-| R0.3 In nRF Connect write hex `5555080301E80301DC05` to FFE1 (servo 1 to center over 1 s). | One servo moves from the phone. |
+| R0.1 ✅ 7.5 V 3 A adapter found. Still to do: note servo cable → port → joint. | Joint table (section 5) has ports. |
+| ✅ R0.2 Phone + nRF Connect: scan with the arm on, note the name and services. | Hiwonder, FFF0/FFE1. |
+| ✅ R0.3 In nRF Connect write hex `5555080301E80301DC05` to FFE1 (servo 1 to center over 1 s). | One servo moves from the phone. |
 | R0.4 ESP32-C3 probe sketch (a spare C3 or the controller itself): scan, connect, send the same frame. | Servo moves from the ESP32. |
 | R0.5 Find each joint's safe min/max by jogging slowly from the probe's serial monitor. | Section 5 filled in. |
 | R1 Controller Arm mode over BLE. | Every joint driven from the handheld; disconnect holds pose. |
