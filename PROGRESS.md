@@ -10,10 +10,8 @@
   servo 1 (claw); battery read 7707 mV. Details in PROJECT-NOTES.md.
 
 ## Next (the user can answer with one of these)
-1. **"Joint map: 1=..., 2=..."** - in nRF Connect write each line to FFE1, one at a time, and say which joint
-   moved (each sends servo N to center, 1500 us, over 2 s; all-center = arm standing straight up):
-   `5555080301D00701DC05` (1) `5555080301D00702DC05` (2) `5555080301D00703DC05` (3)
-   `5555080301D00704DC05` (4) `5555080301D00705DC05` (5) `5555080301D00706DC05` (6)
+1. **"Servo 6: ..."** - joints 1-5 mapped (PROJECT-NOTES). Servo 6 didn't move at center: send
+   `5555080301D00706B004` (to 1200 over 2 s), then `5555080301D00706DC05` (back to center). Base turns, or not?
 2. **"Write the ESP32 probe"** - Claude writes `firmware/probes/ble_probe`: the ESP32-C3 finds "Hiwonder",
    connects, and moves joints from serial-monitor commands. Say which board to flash (the controller itself or a
    spare C3).
