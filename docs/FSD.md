@@ -99,7 +99,7 @@ moves a servo, whether the board answers GET_BATTERY_VOLTAGE over BLE, and which
 | 2 | Wrist roll ✅ | 2 | 550 | 2450 | 1500 | both ends were the probe's 500/2500 cap, not a felt stop |
 | 3 | Wrist pitch ✅ | 3 | 550 | 2450 | 1500 | both ends were the probe's 500/2500 cap, not a felt stop |
 | 4 | Elbow ✅ | 4 | 550 | 2450 | 1500 | both ends were the probe's 500/2500 cap (tested with shoulder at 1500) |
-| 5 | Shoulder ✅ | 5 | | | | heaviest load |
+| 5 | Shoulder ✅ | 5 | 550 | 2450 | 1500 | heaviest load; hit the probe's 500/2500 cap; tested with the elbow at 550, so other elbow angles may reach the table **[?]** |
 | 6 | Base rotate ✅ | 6 | | | | was unplugged at first |
 
 ## 6. Requirements
