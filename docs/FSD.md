@@ -17,7 +17,7 @@ Ambition ladder (each rung works on its own):
 | Rung | Name | What you can do when it's done |
 | --- | --- | --- |
 | 0 | Wake-up | Arm moves from a PC over USB-serial. We know the stock board's language. |
-| 1 | Remote | Drive every joint from the ESP-NOW Controller. |
+| 1 | Remote | Drive every joint from the ESP-NOW Controller over Bluetooth. |
 | 2 | Teach & Repeat | Save poses, string them into a task, replay it once or in a loop. |
 | 3 | Smooth & Safe | Eased motion, speed control, joint limits, soft start, stall/brown-out guard. |
 | 4 | Web App | Sliders, task editor, 3D preview, from a phone over Wi-Fi. Shareable task files. |
@@ -36,30 +36,43 @@ Ambition ladder (each rung works on its own):
 | PS2 handle | Original wireless remote | **Lost** |
 | Power supply | Stock adapter, voltage/current **[?]** (LeArm kits ship ~7.5 V; check the label) | **[?]** |
 | ESP-NOW Controller | ESP32-C3 SuperMini + 1.3" SH1106 OLED, 2-axis joystick + press, Menu/Select/Up/Down buttons, piezo, 1S LiPo | Built (club) |
-| Spare ESP32 boards | For the arm bridge (an ESP32-C3 SuperMini is enough) | **[?]** which ones are on hand |
+| Spare ESP32 boards | Optional: a spare C3 for a BLE probe, or Plan B bridge | **[?]** |
 
 ## 3. System design
 
+**Plan A (no extra hardware): the controller talks Bluetooth straight to the arm.**
+
 ```
- ESP-NOW Controller  ──ESP-NOW (2.4 GHz)──►  Arm Bridge (ESP32-C3)  ──UART──►  Stock 6-ch controller ──PWM──► 6 servos
-   joystick, OLED,                            stores tasks in flash,          5V RX TX GND header
-   buttons, piezo                             Wi-Fi web app, easing
-                ◄──────── telemetry ─────────
-                          (pose, battery, task state)
- Phone/PC browser ──Wi-Fi──► Arm Bridge web app (Rung 4)
+ ESP-NOW Controller (ESP32-C3)  ──BLE──►  DX-BT24 module ──UART──►  Stock LSC-6 board (STM32) ──PWM──► 6 servos
+   joystick, OLED, buttons,                (on the arm's board)       same serial commands as the
+   piezo; saved poses & tasks                                         5V RX TX GND header
+   in its own flash; the brains
 ```
 
-**Why a bridge and not "controller talks to the stock board directly":** the stock board only understands a wired
-serial protocol (and BLE from its app). The bridge turns radio packets into those serial commands, and it is also
-where the brains live (saved tasks, smooth motion, web app), so the arm can run a task with the remote switched off.
+The stock board is a Hiwonder **LSC-6** style controller: an STM32 microcontroller (not an Arduino) that already
+knows how to drive the servos. The phone app works by connecting to the BT24 Bluetooth module, which passes
+bytes straight through to the STM32's serial port. The ESP32-C3 in our controller has Bluetooth LE built in, so
+it can pretend to be the phone app: connect to the BT24 and send the same command bytes (section 4).
 
-**Plan B (if the stock board's serial port won't cooperate):** the bridge drives the servos itself through a
-PCA9685 16-channel PWM board (~$3-5), powered from the arm's supply. Everything above the "UART" arrow stays the same.
+- In Arm mode the controller uses BLE instead of ESP-NOW (one radio job at a time keeps it simple).
+- The brains (saved poses, tasks, easing, limits) live in the controller, since the stock board can't be
+  reprogrammed easily. Tasks replay while the controller is on and connected.
+- Same controller, same buttons, no wiring. Car mode is unchanged.
 
-**Plan C (stop-gap, no code):** buy a generic 2.4 GHz PS2-style wireless handle (~$10-15). Many plug-compatible
-handles pair with the existing receiver dongle **[?]**. Gives the arm its stock features back while we build.
+**Plan B (optional later, if we want tasks to run with the controller off or want a web app):** an ESP32
+"arm bridge" on the `5V RX TX GND` header, talking ESP-NOW to the controller and serial to the board.
 
-## 4. Stock board serial protocol (to be verified in Rung 0)
+**Plan C (if the stock board can't be talked to at all):** the ESP32 drives the servos itself through a PCA9685
+16-channel PWM board (~$3-5).
+
+## 4. Bluetooth link and serial protocol (to be verified in Rung 0)
+
+**BT24 Bluetooth (from a copy of the DX-BT24 manual, not yet checked on our arm):** BLE service `FFE0`,
+characteristic `FFE1` (notify + write), `FFE2` (write). Advertised name **[?]** (find it with the free phone app
+"nRF Connect"). Bytes written to `FFE1` come out of the module's serial pin into the STM32.
+
+**Commands:** Hiwonder's LSC-series controllers use this frame at **9600 baud, 8N1** (from Hiwonder's published
+LSC protocol; **not yet confirmed on our board**). The same bytes work over the header or over Bluetooth:
 
 Hiwonder's LSC-series servo controllers use this frame at **9600 baud, 8N1** (from Hiwonder's published
 LSC protocol; **not yet confirmed on our V2.0 board**):
@@ -76,9 +89,8 @@ LSC protocol; **not yet confirmed on our V2.0 board**):
 
 Example, servo 1 to 1500 µs in 1000 ms: `55 55 08 03 01 E8 03 01 DC 05`.
 
-Rung 0 has to answer: which header pin is RX vs TX from the board's point of view, the logic level (3.3 V or 5 V),
-the baud rate, whether the BLE module shares the same UART (if it does, the bridge and the phone app may fight),
-and which servo ID is which joint.
+Rung 0 has to answer: the BT24's advertised name and services, whether writing a SERVO_MOVE frame to `FFE1`
+moves a servo, whether the board answers GET_BATTERY_VOLTAGE over BLE, and which servo ID is which joint.
 
 ## 5. Joints (fill in during Rung 0)
 
@@ -93,7 +105,11 @@ and which servo ID is which joint.
 
 ## 6. Requirements
 
-### 6.1 Arm Bridge firmware (`firmware/arm_bridge`)
+### 6.1 Arm brains
+
+In Plan A these run **in the ESP-NOW Controller** (the "bridge" below means the controller's arm code); the
+ESP-NOW pairing items (AB-2, AB-4 link loss = BLE disconnect) apply over BLE instead. If Plan B is built later,
+the same code moves to `firmware/arm_bridge`.
 
 | ID | Requirement | Rung |
 | --- | --- | --- |
@@ -107,7 +123,7 @@ and which servo ID is which joint.
 | AB-8 | Store poses (6 positions) and tasks (list of steps) in flash (LittleFS), at least 20 tasks × 100 steps. | 2 |
 | AB-9 | Task steps: MOVE pose over T ms, WAIT T ms, GRIP open/close, BEEP, LOOP N, WAIT FOR BUTTON. | 2 |
 | AB-10 | Play a task once, N times or forever; pause, resume, stop; stop instantly from the controller. | 2 |
-| AB-11 | Run a task with no controller connected (start from the stock board's Run button **[?]** or a button on the bridge). | 2 |
+| AB-11 | Plan B only: run a task with no controller connected (button on the bridge). | 2+ |
 | AB-12 | Eased motion: S-curve between poses, all joints arriving together, global speed 10-200%. | 3 |
 | AB-13 | Brown-out guard: if supply voltage dips under a threshold, slow down and warn. | 3 |
 | AB-14 | Wi-Fi access point + web app (sliders, pose list, task editor, import/export JSON). | 4 |
@@ -130,7 +146,7 @@ and which servo ID is which joint.
 | AC-9 | Hand mode (Rung 5): stick moves the gripper left/right/forward/back, Up/Down = up/down. | 5 |
 | AC-10 | Existing car pairing, settings and web flasher keep working unchanged. | all |
 
-### 6.3 Radio protocol (`ArmProtocol.h`, identical in controller and bridge)
+### 6.3 Radio protocol (Plan B only: `ArmProtocol.h`, identical in controller and bridge)
 
 | ID | Requirement |
 | --- | --- |
@@ -142,7 +158,7 @@ and which servo ID is which joint.
 
 | ID | Requirement |
 | --- | --- |
-| WA-1 | Served by the bridge (and later from GitHub Pages like Pocket Jumbotron). Works on a phone. |
+| WA-1 | Plan A: a GitHub Pages site using Web Bluetooth (Android Chrome or a computer) talking to the BT24 directly. Plan B: served by the bridge. |
 | WA-2 | Six sliders + a 3D stick-figure preview of the arm that matches the real pose. |
 | WA-3 | Task editor: list of steps, drag to reorder, edit times, test one step, play from here. |
 | WA-4 | Save/load tasks as JSON files so students can share them. |
@@ -150,7 +166,7 @@ and which servo ID is which joint.
 
 ## 7. Safety
 
-- S-1 Joint limits are checked in the bridge, not just the controller, so no source (radio, web, serial) can push
+- S-1 Joint limits are checked in the code that sends the commands (controller, web app or bridge), so nothing can push
   past them.
 - S-2 First move after power-up is slow. New tasks play at 25% speed the first time.
 - S-3 Lost link = hold position. Low battery on the controller = warn, then hold.
@@ -161,19 +177,19 @@ and which servo ID is which joint.
 
 | Step | Done when |
 | --- | --- |
-| R0.1 Read the power-supply label; photo the back of the stock board; note servo cable → port → joint. | Joint table (section 5) has ports. |
-| R0.2 Multimeter: voltage on the header's TX pin with the board on (3.3 V or 5 V?). | Level known; safe to connect. |
-| R0.3 USB-serial adapter (or an ESP32 as a pass-through) to the header; send `55 55 08 03 01 E8 03 01 DC 05` (servo 1 to center over 1 s) | One servo moves on command. |
-| R0.4 Find each joint's safe min/max by jogging slowly from a PC script. | Section 5 filled in. |
-| R1 Arm bridge + controller Arm mode. | Every joint driven from the handheld; link loss holds pose. |
+| R0.1 Read the power-supply label; note servo cable → port → joint. | Joint table (section 5) has ports. |
+| R0.2 Phone + nRF Connect: scan with the arm on, note the BT24's name, MAC and services. | FFE0/FFE1 confirmed. |
+| R0.3 In nRF Connect write hex `5555080301E80301DC05` to FFE1 (servo 1 to center over 1 s). | One servo moves from the phone. |
+| R0.4 ESP32-C3 probe sketch (a spare C3 or the controller itself): scan, connect, send the same frame. | Servo moves from the ESP32. |
+| R0.5 Find each joint's safe min/max by jogging slowly from the probe's serial monitor. | Section 5 filled in. |
+| R1 Controller Arm mode over BLE. | Every joint driven from the handheld; disconnect holds pose. |
 | R2 Teach & repeat. | A taught 10-step pick-and-place runs 20 times in a row. |
 | R3+ Later rungs. | Per requirement tables. |
 
 ## 9. Open questions
 
-1. Is the `5V RX TX GND` header the same UART the BT24 Bluetooth module uses? (Probe with the module unplugged/idle.)
-2. Does the V2.0 board answer the LSC protocol at 9600 baud, or is it a different command set? **[?]**
-3. Can the board report servo positions? (PWM servos cannot; the bridge will track the last commanded pose.)
-4. Which ESP32 boards are spare for the bridge? Is a C3 SuperMini enough (yes for Rungs 0-4; IK is light math)?
-5. Does a generic PS2 wireless handle pair with the existing receiver (Plan C)?
-6. Should the project live in the club GitHub account (students use it) or the user's own?
+1. Does the board answer the LSC protocol over BLE, or is it a different command set? **[?]**
+2. Can the board report servo positions? (PWM servos cannot; the controller tracks the last commanded pose.)
+3. Does BLE fit next to the controller's existing code on the C3 (flash/RAM)? Expect yes; NimBLE is ~100 KB.
+4. Does a generic PS2 wireless handle pair with the existing receiver? (No-code stop-gap.)
+5. Decided: public repo on the user's own GitHub account.

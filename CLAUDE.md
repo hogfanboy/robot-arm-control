@@ -5,8 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 RobotArmControl: new brains and a new remote for a LewanSoul/Hiwonder **LeArm 6DOF** robot arm (Amazon B074T6DPKX,
 blue aluminum, 6 PWM servos, stock 6-channel servo controller with DX-BT24 Bluetooth and a PS2 receiver port).
 The original PS2 handle is lost. Plan: drive the arm from the club's **ESP-NOW Controller** (ESP32-C3, OLED, joystick,
-5 buttons) through a small ESP32 "arm bridge", then add teach-and-repeat, a web app and smarter motion.
-No firmware written yet. If this becomes a public GitHub repo: keep personal and school details out of committed files.
+5 buttons) over Bluetooth LE straight to the arm's BT24 module (no extra hardware), then add teach-and-repeat, a web app and smarter motion.
+No firmware written yet. This folder is the clone of a **public** GitHub repo: keep personal and school details out of committed files.
 
 **Read [PROGRESS.md](PROGRESS.md) first.** [docs/FSD.md](docs/FSD.md) is the plan (what we will build, phases,
 requirements). [PROJECT-NOTES.md](PROJECT-NOTES.md) is settled truth (only things checked on the real arm); read only
@@ -31,8 +31,8 @@ the part you need.
 - The stock controller board is the only one we have: probe it read-only first (listen before sending), no
   reflashing it unless the user agrees.
 - The ESP-NOW Controller firmware lives in the club repo `Documents\Arduino\ESP_NOW_Controller` (sister car repo
-  `ESP_NOW_CAR`). Its `Protocol.h` must stay identical to the car's. Arm support goes in a separate `ArmProtocol.h`
-  shared byte-for-byte between the controller and `firmware/arm_bridge`. Don't push to the club's `main` without asking.
+  `ESP_NOW_CAR`). Its `Protocol.h` must stay identical to the car's; Arm mode (BLE) must not change car behavior.
+  A Plan B bridge would get its own `ArmProtocol.h`. Don't push to the club's `main` without asking.
 - Don't read `firmware/*/build/`, `~/.arduino15`, Arduino `libraries/` or `media/` unless asked.
 - Never commit `media/` (photos, videos). Commit as hogfanboy (noreply), never the Gmail.
 - After any feature or bug fix, update PROGRESS.md (under 60 lines): working state, active bug or next task, key
@@ -40,7 +40,7 @@ the part you need.
 
 ## Layout
 - `docs/FSD.md`: spec and roadmap. `docs/` may later hold the GitHub Pages site / web flasher / web app.
-- `firmware/arm_bridge/`: ESP32 that plugs into the arm controller's `5V RX TX GND` header (not started).
+- `firmware/probes/ble_probe/`: first BLE test (planned). `firmware/arm_bridge/`: Plan B only (not planned yet).
 - `firmware/probes/`: one-off tests (UART sniffer, servo sweep).
 - `tools/`: PC-side helpers (serial probe scripts).
 - `media/`: photos and videos (git-ignored).
