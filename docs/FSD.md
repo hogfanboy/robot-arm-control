@@ -34,7 +34,7 @@ Ambition ladder (each rung works on its own):
 | Stock controller | Hiwonder 6-channel servo controller V2.0: 6 servo ports, **DX-BT24** BLE module, **PS2** receiver port, `5V RX TX GND` 4-pin header, Run button, buzzer, LED1/LED2, ON/OFF switch, DC jack + screw terminal, crystal marked "8.00" | In hand |
 | PS2 receiver | Black dongle on a cable to the PS2 port | In hand |
 | PS2 handle | Original wireless remote | **Lost** |
-| Power supply | Stock adapter, voltage/current **[?]** (LeArm kits ship ~7.5 V; check the label) | **[?]** |
+| Power supply | Stock adapter was 7.5 V 3 A (per a retail listing). Replacement: 7.5 V (6-8.4 V ok), 5 A or more, 5.5 x 2.1 mm barrel, center positive **[?]**, or wires into the screw terminal | **Need one** |
 | ESP-NOW Controller | ESP32-C3 SuperMini + 1.3" SH1106 OLED, 2-axis joystick + press, Menu/Select/Up/Down buttons, piezo, 1S LiPo | Built (club) |
 | Spare ESP32 boards | Optional: a spare C3 for a BLE probe, or Plan B bridge | **[?]** |
 
