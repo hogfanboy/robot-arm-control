@@ -11,6 +11,7 @@
 - 2026-11-22: `c` checked: arm was already straight up (all 1500), so nothing moved; that is correct.
   Type ONE command per line (`j 1 -100 / j 1 100` only ran the first part).
 - 2026-11-22: ✅ Servo 6 (base) turns with `m 6 1200 2000` / `m 6 1500 2000`. Its plug had come out of port 6.
+- 2026-11-22: Claw (1) safe range 1300-2450 (backed off 50 from each end). 1300 = open, 2450 = closed.
 - Serial Monitor without the IDE: `arduino-cli monitor -p COM14 -c baudrate=115200` (Ctrl+C to quit; close it
   before uploading). Typed letters may not echo.
 - Probe commands in the Serial Monitor: `m ID POS [MS]`, `j ID STEP`, `c`, `b`, `t MS`, `p`, `raw`.

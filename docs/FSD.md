@@ -95,7 +95,7 @@ moves a servo, whether the board answers GET_BATTERY_VOLTAGE over BLE, and which
 
 | ID | Joint | Stock-board port | Safe min µs | Safe max µs | Home µs | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Gripper ✅ | 1 | | | | open/close |
+| 1 | Gripper ✅ | 1 | 1300 | 2450 | 1500 | 1300 = open, 2450 = closed; 2500 is the probe's software cap, not a felt stop |
 | 2 | Wrist roll ✅ | 2 | | | | |
 | 3 | Wrist pitch ✅ | 3 | | | | |
 | 4 | Elbow ✅ | 4 | | | | |
