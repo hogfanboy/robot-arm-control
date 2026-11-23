@@ -1,0 +1,20 @@
+# Photos and videos - never commit
+media/
+
+# Raw handoff notes
+CLAUDE NOTES.md
+
+# Arduino / PlatformIO build output
+build/
+.pio/
+*.elf
+*.map
+
+# Node
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
